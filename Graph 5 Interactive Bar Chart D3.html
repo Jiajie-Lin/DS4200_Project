@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top 10 Best vs Worst Fast Food Items</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .title {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+        .metric-selector {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .metric-btn {
+            padding: 8px 15px;
+            background-color: #e0e0e0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .metric-btn.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .axis {
+            font-size: 12px;
+        }
+        .axis-label {
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .tooltip {
+            position: absolute;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            border-radius: 4px;
+            pointer-events: none;
+            font-size: 12px;
+            max-width: 300px;
+        }
+        .takeaway {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+        }
+        .takeaway h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .bar {
+            transition: opacity 0.3s;
+        }
+        .bar:hover {
+            opacity: 0.8;
+        }
+        .legend {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+            gap: 20px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .legend-color {
+            width: 15px;
+            height: 15px;
+            border-radius: 3px;
+        }
+        .chart-title {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 18px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 6px;
+        }
+        .vertical-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .chart-section {
+            width: 100%;
+        }
+        .chart-container {
+            height: 350px;
+            overflow: visible;
+        }
+        /* Remove border styles */
+        .best-section {
+            padding-bottom: 10px;
+        }
+        .worst-section {
+            padding-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Top 10 Best vs Worst Fast Food Items</h1>
+        <p class="subtitle">Comparing the best and worst menu items across major fast food chains</p>
+        
+        <div class="controls">
+            <div class="metric-selector">
+                <button class="metric-btn active" data-metric="calories">Calories</button>
+                <button class="metric-btn" data-metric="total_fat">Total Fat</button>
+                <button class="metric-btn" data-metric="sodium">Sodium</button>
+                <button class="metric-btn" data-metric="sugar">Sugar</button>
+            </div>
+        </div>
+        
+        <div class="vertical-chart">
+            <div class="chart-section worst-section">
+                <div class="chart-title" style="background-color: #FFEBEE;">Top 10 Worst</div>
+                <div class="chart-container" id="worst-chart"></div>
+            </div>
+            <div class="chart-section best-section">
+                <div class="chart-title" style="background-color: #E8F5E8;">Top 10 Best</div>
+                <div class="chart-container" id="best-chart"></div>
+            </div>
+        </div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #FF9A8B;"></div>
+                <span>Top 10 Worst</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #7BE495;"></div>
+                <span>Top 10 Best</span>
+            </div>
+        </div>
+        
+        <div class="takeaway">
+            <h3>Ordering Guide</h3>
+            <p id="takeaway-text">Salads and grilled chicken items are typically the healthiest choices, while burgers and specialty sandwiches often contain the most calories. When ordering, choose items with higher protein and lower saturated fat.</p>
+        </div>
+    </div>
+
+    <script>
+        // Set dimensions and margins
+        const margin = { top: 50, right: 80, bottom: 50, left: 350 };
+        const width = 1100 - margin.left - margin.right;
+        const height = 320 - margin.top - margin.bottom;
+
+        // Create SVGs
+        const bestSvg = d3.select("#best-chart")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", `translate(${margin.left},${margin.top})`);
+
+        const worstSvg = d3.select("#worst-chart")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", `translate(${margin.left},${margin.top})`);
+
+        // Create tooltip
+        const tooltip = d3.select("body")
+            .append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+
+        // Current metric
+        let currentMetric = 'calories';
+
+        // Load and process data
+        d3.csv("fastfood.csv").then(function(data) {
+            // Data preprocessing
+            data.forEach(d => {
+                d.calories = +d.calories;
+                d.total_fat = +d.total_fat;
+                d.sat_fat = +d.sat_fat;
+                d.trans_fat = +d.trans_fat;
+                d.cholesterol = +d.cholesterol;
+                d.sodium = +d.sodium;
+                d.total_carb = +d.total_carb;
+                d.fiber = +d.fiber;
+                d.sugar = +d.sugar;
+                d.protein = +d.protein;
+                d.vit_a = +d.vit_a;
+                d.vit_c = +d.vit_c;
+                d.calcium = +d.calcium;
+            });
+
+            // Update charts with initial metric
+            updateCharts(data, currentMetric);
+
+            // Add event listeners for metric buttons
+            d3.selectAll(".metric-btn").on("click", function() {
+                // Update active button
+                d3.selectAll(".metric-btn").classed("active", false);
+                d3.select(this).classed("active", true);
+                
+                // Update charts with new metric
+                currentMetric = d3.select(this).attr("data-metric");
+                updateCharts(data, currentMetric);
+            });
+        });
+
+        // Update charts function
+        function updateCharts(data, metric) {
+            // Clear previous charts
+            bestSvg.selectAll("*").remove();
+            worstSvg.selectAll("*").remove();
+
+            // Get top 10 best and worst items for selected metric
+            const sortedData = [...data].sort((a, b) => a[metric] - b[metric]);
+            const bestItems = sortedData.slice(0, 10);
+            const worstItems = sortedData.slice(-10).reverse();
+
+            // Create top 10 best items chart
+            createChart(bestSvg, bestItems, metric, '#7BE495', true);
+            
+            // Create top 10 worst items chart
+            createChart(worstSvg, worstItems, metric, '#FF9A8B', false);
+
+            // Update guide text
+            updateTakeaway(metric, bestItems, worstItems);
+        }
+
+        // Create individual chart function
+        function createChart(svg, items, metric, color, isBest) {
+            // Create scales
+            const maxValue = d3.max(items, d => d[metric]);
+            const minValue = d3.min(items, d => d[metric]);
+            
+            // Calculate domain with proper bounds
+            const domainMin = 0; // Always start from 0
+            const domainMax = Math.max(maxValue, 10); // Ensure minimum domain for visibility
+            
+            const xScale = d3.scaleLinear()
+                .domain([domainMin, domainMax])
+                .range([0, width]);
+
+            const yScale = d3.scaleBand()
+                .domain(items.map(d => d.item))
+                .range([0, height])
+                .padding(0.3);
+
+            // Create optimized tick values based on data range
+            const tickValues = generateOptimalTickValues(minValue, maxValue, metric, isBest);
+
+            const xAxis = d3.axisTop(xScale)
+                .tickValues(tickValues)
+                .tickFormat(d3.format("d"));
+
+            const yAxis = d3.axisLeft(yScale);
+
+            // Add X axis
+            svg.append("g")
+                .attr("class", "axis")
+                .call(xAxis)
+                .selectAll("text")
+                .style("font-size", "11px")
+                .style("text-anchor", "middle");
+
+            // Add Y axis
+            const yAxisGroup = svg.append("g")
+                .attr("class", "axis")
+                .call(yAxis);
+
+            // Adjust Y axis label position
+            yAxisGroup.selectAll("text")
+                .style("font-size", "12px")
+                .style("font-weight", "500")
+                .attr("dx", "-10px")
+                .call(wrapText, margin.left - 20);
+
+            // Add axis label
+            svg.append("text")
+                .attr("class", "axis-label")
+                .attr("x", width / 2)
+                .attr("y", -35)
+                .attr("text-anchor", "middle")
+                .style("font-size", "15px")
+                .text(getMetricLabel(metric));
+
+            // Create bars - including bars with 0 values
+            svg.selectAll(".bar")
+                .data(items)
+                .enter()
+                .append("rect")
+                .attr("class", "bar")
+                .attr("x", 0)
+                .attr("y", d => yScale(d.item))
+                .attr("width", d => Math.max(1, xScale(d[metric]))) // Ensure at least 1px width for visibility
+                .attr("height", yScale.bandwidth())
+                .attr("fill", color)
+                .on("mouseover", function(event, d) {
+                    tooltip.transition()
+                        .duration(200)
+                        .style("opacity", .9);
+                    tooltip.html(`
+                        <strong>${d.item}</strong> (${d.restaurant})<br/>
+                        Calories: ${d.calories}<br/>
+                        Total Fat: ${d.total_fat}g<br/>
+                        Saturated Fat: ${d.sat_fat}g<br/>
+                        Sodium: ${d.sodium}mg<br/>
+                        Sugar: ${d.sugar}g<br/>
+                        Protein: ${d.protein}g
+                    `)
+                        .style("left", (event.pageX + 10) + "px")
+                        .style("top", (event.pageY - 28) + "px");
+                })
+                .on("mouseout", function() {
+                    tooltip.transition()
+                        .duration(500)
+                        .style("opacity", 0);
+                })
+                .on("click", function(event, d) {
+                    alert(`${d.item} (${d.restaurant}) Complete Nutrition Information:\n
+Calories: ${d.calories}
+Total Fat: ${d.total_fat}g
+Saturated Fat: ${d.sat_fat}g
+Trans Fat: ${d.trans_fat}g
+Cholesterol: ${d.cholesterol}mg
+Sodium: ${d.sodium}mg
+Total Carbohydrates: ${d.total_carb}g
+Fiber: ${d.fiber}g
+Sugar: ${d.sugar}g
+Protein: ${d.protein}g
+Vitamin A: ${d.vit_a}%
+Vitamin C: ${d.vit_c}%
+Calcium: ${d.calcium}%`);
+                });
+
+            // Add value labels - including 0 values
+            svg.selectAll(".value-label")
+                .data(items)
+                .enter()
+                .append("text")
+                .attr("class", "value-label")
+                .attr("x", d => Math.max(8, xScale(d[metric]) + 8)) // Ensure label is visible even for 0 values
+                .attr("y", d => yScale(d.item) + yScale.bandwidth() / 2)
+                .attr("dy", ".35em")
+                .text(d => d[metric])
+                .style("font-size", "11px")
+                .style("fill", "#333")
+                .style("font-weight", "bold");
+        }
+
+        // Generate optimal tick values based on data range
+        function generateOptimalTickValues(minValue, maxValue, metric, isBest) {
+            // Special case for Calories Top 10 Worst
+            if (metric === 'calories' && !isBest) {
+                return [0, 600, 1200, 1800, 2400];
+            }
+            
+            // Ensure we have valid values
+            const safeMin = Math.max(0, minValue);
+            const safeMax = Math.max(10, maxValue); // Ensure minimum range for visibility
+            
+            const range = safeMax - 0; // Domain always starts at 0
+            
+            // Determine optimal step size based on range
+            let step;
+            if (range <= 50) {
+                step = 10;
+            } else if (range <= 100) {
+                step = 20;
+            } else if (range <= 200) {
+                step = 50;
+            } else if (range <= 500) {
+                step = 100;
+            } else if (range <= 1000) {
+                step = 200;
+            } else if (range <= 2000) {
+                step = 500;
+            } else {
+                step = 1000;
+            }
+            
+            // Calculate number of ticks
+            let numTicks = Math.ceil(range / step);
+            
+            // Adjust to get nice round numbers and optimal tick count
+            if (numTicks < 4) {
+                step = Math.max(10, Math.ceil(range / 4 / 10) * 10);
+                numTicks = 4;
+            } else if (numTicks > 7) {
+                step = Math.ceil(range / 7 / 50) * 50;
+                numTicks = Math.ceil(range / step);
+            }
+            
+            // Generate tick values starting from 0
+            const tickValues = [];
+            let currentTick = 0;
+            
+            // Always include 0
+            tickValues.push(0);
+            
+            // Add ticks until we exceed the max value
+            while (currentTick <= safeMax) {
+                currentTick += step;
+                if (currentTick <= safeMax * 1.1) { // Add some buffer
+                    tickValues.push(currentTick);
+                }
+            }
+            
+            // Ensure we have at least 2 ticks
+            if (tickValues.length < 2) {
+                tickValues.push(step);
+            }
+            
+            // Ensure the last tick is at least the max value
+            if (tickValues[tickValues.length - 1] < safeMax) {
+                tickValues.push(tickValues[tickValues.length - 1] + step);
+            }
+            
+            return tickValues;
+        }
+
+        // Get metric label for display
+        function getMetricLabel(metric) {
+            const labels = {
+                'calories': 'Calories',
+                'total_fat': 'Total Fat (g)',
+                'sodium': 'Sodium (mg)',
+                'sugar': 'Sugar (g)'
+            };
+            return labels[metric] || metric;
+        }
+
+        // Text wrapping function
+        function wrapText(selection, width) {
+            selection.each(function() {
+                var text = d3.select(this);
+                var words = text.text().split(/\s+/).reverse();
+                var word;
+                var line = [];
+                var lineNumber = 0;
+                var lineHeight = 1.1;
+                var y = text.attr("y");
+                var dy = parseFloat(text.attr("dy"));
+                var tspan = text.text(null).append("tspan").attr("x", -10).attr("y", y).attr("dy", dy + "em");
+                
+                while (word = words.pop()) {
+                    line.push(word);
+                    tspan.text(line.join(" "));
+                    if (tspan.node().getComputedTextLength() > width) {
+                        line.pop();
+                        tspan.text(line.join(" "));
+                        line = [word];
+                        tspan = text.append("tspan").attr("x", -10).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+                    }
+                }
+            });
+        }
+
+        // Update guide text based on current metric
+        function updateTakeaway(metric, bestItems, worstItems) {
+            let takeawayText = "";
+            
+            switch(metric) {
+                case 'calories':
+                    takeawayText = `The top 10 best items average ${Math.round(d3.mean(bestItems, d => d.calories))} calories, while the top 10 worst items average ${Math.round(d3.mean(worstItems, d => d.calories))} calories. Salads and grilled items typically have lower calories.`;
+                    break;
+                case 'total_fat':
+                    takeawayText = `The top 10 best items average ${Math.round(d3.mean(bestItems, d => d.total_fat))}g of fat, while the top 10 worst items average ${Math.round(d3.mean(worstItems, d => d.total_fat))}g. Choosing grilled over fried items can reduce fat intake.`;
+                    break;
+                case 'sodium':
+                    takeawayText = `Sodium content varies greatly, with the top 10 best items averaging ${Math.round(d3.mean(bestItems, d => d.sodium))}mg and the top 10 worst items averaging ${Math.round(d3.mean(worstItems, d => d.sodium))}mg. Many fast food items exceed the recommended daily sodium intake in just one meal.`;
+                    break;
+                case 'sugar':
+                    takeawayText = `The top 10 best items average ${Math.round(d3.mean(bestItems, d => d.sugar))}g of sugar, while the top 10 worst items average ${Math.round(d3.mean(worstItems, d => d.sugar))}g. Watch out for hidden sugars in sauces and dressings.`;
+                    break;
+                default:
+                    takeawayText = "Salads and grilled chicken items are typically the healthiest choices, while burgers and specialty sandwiches often contain the most calories. When ordering, choose items with higher protein and lower saturated fat.";
+            }
+            
+            document.getElementById("takeaway-text").textContent = takeawayText;
+        }
+    </script>
+</body>
+</html>
