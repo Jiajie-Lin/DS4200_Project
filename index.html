@@ -194,38 +194,65 @@
 <p>I created the interactive Best vs Worst bar chart to give users the most practical, actionable information: which specific menu items they should avoid and which ones they should consider ordering. Instead of comparing restaurants or categories, this chart ranks individual items using metrics like calories, fat, sodium, and sugar. The toggle buttons let viewers instantly change the criteria, and the chart recomputes the top 10 best and worst choices on the fly. This level of interactivity empowers users to explore the dataset based on their own health priorities. By presenting the healthiest and unhealthiest items side-by-side, this visualization delivers direct guidance and creates clear, memorable takeaways.</p>
 
   <!-- ========= Conclusion ========= -->
-  <h2>Conclusion</h2>
+    <h2>Conclusion</h2>
   <p style="text-indent: 2em;">
-    This project provides a comprehensive look into the nutritional landscape of major U.S.
-    fast-food restaurants. Through our visualizations, we found that calorie levels vary
-    significantly across chains, with some restaurants offering a much wider range of calorie
-    options than others. This suggests that consumers may unknowingly select extremely high-calorie
-    items unless they actively check nutritional information.
+    This project uses more than 5,000 menu items from major fast food chains to give a clearer
+    picture of how calories and other nutrients are distributed across restaurants, food
+    categories, and individual items. By combining interactive bar charts, box plots, scatter
+    plots, and ranking charts, we move beyond simple calorie counts and show how different
+    nutrients interact in real menus that people actually order.
   </p>
 
   <p style="text-indent: 2em;">
-    Our interactive scatter plot further demonstrates that high-calorie items tend to be high in
-    sodium, fat, and sugar as well. This means that choosing a high-calorie item rarely affects only
-    one nutritional dimension—these items often present multiple simultaneous health risks. For
-    individuals concerned about heart disease, blood pressure, or diabetes, these combined factors
-    make informed decision-making especially important.
+    <strong>What we learned from the graphs:</strong>
+    Graph 1 compares average nutritional content across restaurants and shows that some chains
+    have consistently higher levels of calories, fat, and sodium, while others provide items
+    with relatively more fiber, vitamins, or protein. This suggests that the “typical” meal at
+    one chain can be much heavier than at another, even before looking at portion size.
   </p>
 
   <p style="text-indent: 2em;">
-    Overall, our analysis highlights the importance of nutritional transparency in the fast-food
-    industry. While some chains offer healthier or more consistent options, others contain clusters
-    of items with extremely high levels of calories and other nutrients. Understanding these patterns
-    can empower consumers to make healthier choices and encourage restaurants to improve the
-    nutritional balance of their menus.
+    Graph 2 and Graph 3 focus on how risky a single choice can be. The box plots in Graph 2 show
+    how calories are spread within each restaurant. Chains with tall boxes and long whiskers
+    offer both moderate and extremely high calorie items, which makes it easy to “accidentally”
+    pick an item that is far above the average. Graph 3 shows that once calories go up, sodium,
+    fat, and sugar usually increase at the same time. High calorie items are rarely “bad” in only
+    one dimension. They tend to be high in several unhealthy metrics, which increases long term
+    health risks such as heart disease and high blood pressure.
   </p>
 
   <p style="text-indent: 2em;">
-    <strong>Future Work:</strong>
-    To further strengthen this research, future analysis could incorporate portion sizes, pricing,
-    customer demographics, or temporal trends to examine how nutritional quality changes over time.
-    Additional visualizations could also explore healthier alternatives or predict nutritional risks
-    using machine learning methods.
+    Graph 4 and Graph 5 translate these patterns into more practical guidance. The macronutrient
+    visualizations in Graph 4 compare food categories such as burgers, salads, chicken items,
+    Mexican food, hot dogs, and pizza. Burgers and pizza tend to have the highest fat and
+    carbohydrate levels, while salads and some chicken options have more balanced profiles with
+    lower carbs and reasonable protein. This means that choosing a different category
+    (for example salad or grilled chicken instead of a burger) can change the entire nutrient
+    profile of the meal, even when the total calories are similar.
   </p>
+
+  <p style="text-indent: 2em;">
+    Graph 5 focuses on the top ten “best” and “worst” items for calories, fat, sodium, and sugar.
+    It shows that the gap between the healthiest and least healthy items is very large. For many
+    metrics, the worst items contain several times more calories, fat, or sodium than the best
+    items from the same dataset. At the same time, the healthiest items are often salads or
+    grilled chicken dishes, which still provide protein but with much less saturated fat and
+    added sugar. This ranking view turns our analysis into a concrete ordering guide: by avoiding
+    the worst items and choosing from the best group, consumers can reduce several risk factors
+    at once without completely giving up fast food.
+  </p>
+
+  <p style="text-indent: 2em;">
+    Overall, these graphs show that fast food nutrition is not random. Certain restaurants,
+    categories, and menu items reliably carry higher nutritional risks. At the same time, there
+    are better choices hidden in the menus if customers know where to look. In future work, this
+    analysis could be extended to portion sizes, prices, and daily recommended limits, or turned
+    into an interactive tool where users can filter by personal goals such as “low sodium” or
+    “high protein.” Our project is a first step toward making the fast food environment more
+    transparent, so that people can make informed decisions rather than guessing from the menu
+    pictures alone.
+  </p>
+
 
   <!-- ========== Graph 2 JS (Box Plot) ========== -->
   <script>
