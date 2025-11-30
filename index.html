@@ -1,40 +1,514 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<!-- Head-->
- <head>
-    <meta charset="UTF-8">
-    <meta name = 'viewport' content="width=device-width, initial-scale = 1.0">
-    <title> Homework 3 </title>
-    <link href="https://fonts.googleapis.com/css2?family=Allura&display=swap" rel="stylesheet">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DS4200 Project – Fast Food Nutrition</title>
+  <link href="https://fonts.googleapis.com/css2?family=Allura&display=swap" rel="stylesheet">
 
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 950px;
+      margin: 0 auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+
+    h1,
+    h2 {
+      margin-top: 20px;
+    }
+
+    #boxplot-graph2 {
+      margin-top: 10px;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 10px;
+      text-align: left;
+    }
+
+    /* Graph 3 styles */
+    #controls {
+      margin: 10px 0 20px 0;
+      text-align: center;
+    }
+
+    #scatter-graph3 {
+      margin-top: 10px;
+    }
+
+    .tooltip {
+      position: absolute;
+      background: white;
+      border: 1px solid #ccc;
+      padding: 6px 8px;
+      font-size: 0.8rem;
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    #legend {
+      margin-top: 10px;
+      font-size: 0.8rem;
+    }
+
+    #legend span {
+      margin-right: 10px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    #legend svg {
+      margin-right: 4px;
+    }
+  </style>
+
+  <!-- D3 for Graph 2 and Graph 3 -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 
 <body>
-    <h1 style = 'text-align: center;'> Jiajie Lin, Weilun Guan, Jiayu Zou</h1>
-    <h1 style= 'text-align: center;'></h1>
-    <h1 style= "text-align: center; font-weight: bold; text-decoration: underline;"> Nutrition</h1>
-    <h2>Introduction</h2>
-    <p style = 'text-indent: 2em;'>Over 40% of Americans are obese, and fast food has become deeply embedded in American culture. Approximately 37% of Americans consume fast food every day, averaging over 800 calories per meal—nearly half of the recommended daily caloric intake. Since the first White Castle opened in Wichita, Kansas in 1921, the industry has exploded into a global phenomenon, with chains like McDonald's now serving 26 million consumers daily in America alone. Despite these serious health consequences, consumers remain ill-equipped to understand what they are consuming and which items pose the greatest risks. This project analyzes over 5,000 menu items from more than 20 major U.S. fast-food chains to provide clear, data-driven insights into the nutritional landscape of fast food, empowering consumers to make informed dietary choices.</p>
-    <h2>Data Introduction</h2>
-    <p style = 'text-indent: 2em;'>
-    This project utilizes the Fast Food Nutrition dataset from Kaggle, compiled by Ulrik Thyge Pedersen, which contains nutritional information for approximately 5,000 food items from over 20 major U.S. fast-food chains. The dataset includes comprehensive nutritional variables for each menu item: restaurant name, item name, calories, calories from fat, total fat, saturated fat, trans fat, cholesterol, sodium, total carbohydrates, dietary fiber, sugar, protein, and select vitamins and minerals (Vitamin A, Vitamin C, calcium). To ensure data quality and analytical accuracy, we performed several preprocessing steps including handling missing values for certain nutritional metrics, normalizing measurement units across different restaurant chains, removing duplicate entries, and categorizing food items into meaningful groups such as burgers, drinks, desserts, and sandwiches. This cleaned and structured dataset serves as the foundation for all subsequent analyses and visualizations, enabling us to identify nutritional patterns, compare restaurant offerings, and highlight both the healthiest and most problematic menu items available to consumers.
-    </p>
-    <h2>References </h2>
-    <p style = 'text-indent: 2em;'>
-    This project draws upon peer-reviewed research to contextualize the nutritional analysis of fast food in America. Bauer et al.'s longitudinal study in the American Journal of Preventive Medicine examines 14-year trends in nutritional quality across eight major U.S. fast-food chains, providing critical insight into how the industry has evolved over time. Bahadoran et al.'s comprehensive review in Health Promotion Perspectives explores the relationship between fast food consumption patterns and cardiometabolic disorders, highlighting the serious health implications of regular fast food intake. The primary dataset for this analysis comes from Ulrik Thyge Pedersen's "Fast Food Nutrition" compilation on Kaggle, which aggregates nutritional information from over 20 fast-food chains and serves as the foundation for our visualizations and findings. Together, these sources provide both the empirical data and scholarly context necessary to understand the nutritional landscape of American fast food and its impact on public health.
-    </p>
+  <h1 style="text-align: center;">Jiajie Lin, Weilun Guan, Jiayu Zou</h1>
+  <h1 style="text-align: center;"></h1>
+  <h1 style="text-align: center; font-weight: bold; text-decoration: underline;">Nutrition</h1>
 
-    <h1  style= 'text-align: center; text-decoration: underline; font-weight: bold;''> Graphs </h1>
+  <h2>Introduction</h2>
+  <p style='text-indent: 2em;'>
+    Over 40% of Americans are obese, and fast food has become deeply embedded in American culture.
+    Approximately 37% of Americans consume fast food every day, averaging over 800 calories per
+    meal—nearly half of the recommended daily caloric intake. Since the first White Castle opened
+    in Wichita, Kansas in 1921, the industry has exploded into a global phenomenon, with chains
+    like McDonald's now serving 26 million consumers daily in America alone. Despite these serious
+    health consequences, consumers remain ill-equipped to understand what they are consuming and
+    which items pose the greatest risks. This project analyzes over 5,000 menu items from more
+    than 20 major U.S. fast-food chains to provide clear, data-driven insights into the nutritional
+    landscape of fast food, empowering consumers to make informed dietary choices.
+  </p>
 
-    <h2>Graph 1 </h2>
-    <iframe src = 'graph1.html' width = '80%' height="700px" frameboarder = '0'></iframe>
-    <h2>Graph 2 </h2>
-    
-    <h2>Graph 3 </h2>
-    
-    <h2>Graph 4 </h2>
-    
-    <h2>Graph 5 </h2>
+  <h2>Data Introduction</h2>
+  <p style='text-indent: 2em;'>
+    This project utilizes the Fast Food Nutrition dataset from Kaggle, compiled by Ulrik Thyge
+    Pedersen, which contains nutritional information for approximately 5,000 food items from over
+    20 major U.S. fast-food chains. The dataset includes comprehensive nutritional variables for
+    each menu item: restaurant name, item name, calories, calories from fat, total fat, saturated
+    fat, trans fat, cholesterol, sodium, total carbohydrates, dietary fiber, sugar, protein, and
+    select vitamins and minerals (Vitamin A, Vitamin C, calcium). To ensure data quality and
+    analytical accuracy, we performed several preprocessing steps including handling missing values
+    for certain nutritional metrics, normalizing measurement units across different restaurant
+    chains, removing duplicate entries, and categorizing food items into meaningful groups such as
+    burgers, drinks, desserts, and sandwiches. This cleaned and structured dataset serves as the
+    foundation for all subsequent analyses and visualizations, enabling us to identify nutritional
+    patterns, compare restaurant offerings, and highlight both the healthiest and most problematic
+    menu items available to consumers.
+  </p>
 
-<body>
+  <h2>References</h2>
+  <p style='text-indent: 2em;'>
+    This project draws upon peer-reviewed research to contextualize the nutritional analysis of
+    fast food in America. Bauer et al.'s longitudinal study in the American Journal of Preventive
+    Medicine examines 14-year trends in nutritional quality across eight major U.S. fast-food
+    chains, providing critical insight into how the industry has evolved over time. Bahadoran
+    et al.'s comprehensive review in Health Promotion Perspectives explores the relationship
+    between fast food consumption patterns and cardiometabolic disorders, highlighting the serious
+    health implications of regular fast food intake. The primary dataset for this analysis comes
+    from Ulrik Thyge Pedersen's "Fast Food Nutrition" compilation on Kaggle, which aggregates
+    nutritional information from over 20 fast-food chains and serves as the foundation for our
+    visualizations and findings. Together, these sources provide both the empirical data and
+    scholarly context necessary to understand the nutritional landscape of American fast food and
+    its impact on public health.
+  </p>
+
+  <h1 style='text-align: center; text-decoration: underline; font-weight: bold;'>Graphs</h1>
+
+  <!-- ================= Graph 1 ================= -->
+  <h2>Graph 1: Average Calories by Restaurant</h2>
+  <iframe src="graph1.html" width="80%" height="700px" frameborder="0"></iframe>
+
+  <!-- ================= Graph 2 ================= -->
+  <h2>Graph 2: Calorie Distribution by Restaurant (Box Plot)</h2>
+  <p class="subtitle">Box Plot · D3.js · Author: Jiayu Zou</p>
+
+  <div id="boxplot-graph2"></div>
+
+  <p>
+    This box plot shows the distribution of calories for menu items at each fast-food restaurant
+    in our dataset. For every restaurant, the box represents the interquartile range (IQR) of
+    calories, the line inside the box marks the median, and the whiskers show typical minimum and
+    maximum values. Points beyond the whiskers represent outliers, which are extremely high- or
+    low-calorie menu items.
+  </p>
+
+  <p>
+    <strong>Takeaway:</strong>
+    Restaurants with taller boxes and longer whiskers have more variability in calorie levels,
+    meaning it is easier to accidentally choose a very high-calorie item. In contrast, restaurants
+    with tighter boxes offer more consistent calorie ranges across their menus.
+  </p>
+
+  <!-- ================= Graph 3 ================= -->
+  <h2>Graph 3: Scatter Plot – Calories vs Sodium/Fat/Sugar</h2>
+  <p class="subtitle">Interactive Scatter Plot · D3.js · Author: Jiayu Zou</p>
+
+  <div id="controls">
+    <label for="metric-select">Y-axis metric:&nbsp;</label>
+    <select id="metric-select">
+      <option value="sodium">Sodium (mg)</option>
+      <option value="total_fat">Total Fat (g)</option>
+      <option value="sugar">Sugar (g)</option>
+    </select>
+  </div>
+
+  <div id="scatter-graph3"></div>
+  <div id="legend"></div>
+
+  <p>
+    This interactive scatter plot visualizes the relationship between calories and other
+    unhealthy nutrients in fast-food menu items. Each point represents a single menu item,
+    plotted by its calories on the x-axis and sodium, total fat, or sugar on the y-axis.
+    The color encodes the restaurant so that we can compare patterns across different
+    chains. Users can switch the y-axis metric to explore how calories are related to
+    sodium, fat, and sugar separately.
+  </p>
+
+  <p>
+    <strong>Takeaway:</strong>
+    Overall, items with higher calories also tend to contain more sodium, fat, or sugar,
+    which means that choosing a high-calorie fast-food item usually involves multiple
+    nutritional risks at the same time. Some restaurants show clusters of very
+    high-calorie, high-sodium items, which may be especially important to avoid for
+    people concerned about heart health or blood pressure.
+  </p>
+
+  <!-- ================= Placeholders for Graph 4 & 5 ================= -->
+  <h2>Graph 4</h2>
+
+  <h2>Graph 5</h2>
+
+  <!-- ========== Graph 2 JS (Box Plot) ========== -->
+  <script>
+    const margin2 = { top: 40, right: 30, bottom: 140, left: 80 };
+    const width2 = 900 - margin2.left - margin2.right;
+    const height2 = 500 - margin2.top - margin2.bottom;
+
+    const svg2 = d3.select("#boxplot-graph2")
+      .append("svg")
+      .attr("width", width2 + margin2.left + margin2.right)
+      .attr("height", height2 + margin2.top + margin2.bottom)
+      .append("g")
+      .attr("transform", `translate(${margin2.left},${margin2.top})`);
+
+    d3.csv("fastfood.csv", d3.autoType).then(data => {
+      console.log("Loaded rows for Graph 2:", data.length);
+
+      data = data.filter(d =>
+        d.restaurant != null &&
+        d.calories != null &&
+        !isNaN(d.calories)
+      );
+
+      const grouped = d3.groups(data, d => d.restaurant).map(([restaurant, values]) => {
+        const calories = values
+          .map(d => d.calories)
+          .filter(v => !isNaN(v))
+          .sort(d3.ascending);
+
+        const q1 = d3.quantile(calories, 0.25);
+        const median = d3.quantile(calories, 0.50);
+        const q3 = d3.quantile(calories, 0.75);
+        const iqr = q3 - q1;
+
+        const lowerFence = q1 - 1.5 * iqr;
+        const upperFence = q3 + 1.5 * iqr;
+
+        const min = d3.min(calories.filter(v => v >= lowerFence));
+        const max = d3.max(calories.filter(v => v <= upperFence));
+
+        return {
+          restaurant,
+          q1,
+          median,
+          q3,
+          iqr,
+          min,
+          max,
+          values: calories,
+          lowerFence,
+          upperFence
+        };
+      });
+
+      grouped.sort((a, b) => d3.ascending(a.restaurant, b.restaurant));
+
+      const x2 = d3.scaleBand()
+        .domain(grouped.map(d => d.restaurant))
+        .range([0, width2])
+        .paddingInner(0.4)
+        .paddingOuter(0.2);
+
+      svg2.append("g")
+        .attr("transform", `translate(0,${height2})`)
+        .call(d3.axisBottom(x2))
+        .selectAll("text")
+        .attr("transform", "rotate(-45)")
+        .style("text-anchor", "end");
+
+      const y2 = d3.scaleLinear()
+        .domain([
+          0,
+          d3.max(grouped, d => d.max) * 1.05
+        ])
+        .nice()
+        .range([height2, 0]);
+
+      svg2.append("g").call(d3.axisLeft(y2));
+
+      const boxWidth2 = x2.bandwidth() * 0.5;
+
+      svg2.selectAll(".whisker-line")
+        .data(grouped)
+        .enter()
+        .append("line")
+        .attr("class", "whisker-line")
+        .attr("x1", d => x2(d.restaurant) + x2.bandwidth() / 2)
+        .attr("x2", d => x2(d.restaurant) + x2.bandwidth() / 2)
+        .attr("y1", d => y2(d.min))
+        .attr("y2", d => y2(d.max))
+        .attr("stroke", "black");
+
+      svg2.selectAll(".whisker-top")
+        .data(grouped)
+        .enter()
+        .append("line")
+        .attr("class", "whisker-top")
+        .attr("x1", d => x2(d.restaurant) + x2.bandwidth() / 2 - boxWidth2 / 4)
+        .attr("x2", d => x2(d.restaurant) + x2.bandwidth() / 2 + boxWidth2 / 4)
+        .attr("y1", d => y2(d.max))
+        .attr("y2", d => y2(d.max))
+        .attr("stroke", "black");
+
+      svg2.selectAll(".whisker-bottom")
+        .data(grouped)
+        .enter()
+        .append("line")
+        .attr("class", "whisker-bottom")
+        .attr("x1", d => x2(d.restaurant) + x2.bandwidth() / 2 - boxWidth2 / 4)
+        .attr("x2", d => x2(d.restaurant) + x2.bandwidth() / 2 + boxWidth2 / 4)
+        .attr("y1", d => y2(d.min))
+        .attr("y2", d => y2(d.min))
+        .attr("stroke", "black");
+
+      svg2.selectAll(".box")
+        .data(grouped)
+        .enter()
+        .append("rect")
+        .attr("class", "box")
+        .attr("x", d => x2(d.restaurant) + (x2.bandwidth() - boxWidth2) / 2)
+        .attr("y", d => y2(d.q3))
+        .attr("width", boxWidth2)
+        .attr("height", d => Math.max(1, y2(d.q1) - y2(d.q3)))
+        .attr("stroke", "black")
+        .attr("fill", "#cccccc");
+
+      svg2.selectAll(".median-line")
+        .data(grouped)
+        .enter()
+        .append("line")
+        .attr("class", "median-line")
+        .attr("x1", d => x2(d.restaurant) + (x2.bandwidth() - boxWidth2) / 2)
+        .attr("x2", d => x2(d.restaurant) + (x2.bandwidth() + boxWidth2) / 2)
+        .attr("y1", d => y2(d.median))
+        .attr("y2", d => y2(d.median))
+        .attr("stroke", "black")
+        .attr("stroke-width", 2);
+
+      const outlierData2 = [];
+      grouped.forEach(g => {
+        g.values.forEach(v => {
+          if (v < g.min || v > g.max) {
+            outlierData2.push({ restaurant: g.restaurant, calories: v });
+          }
+        });
+      });
+
+      svg2.selectAll(".outlier")
+        .data(outlierData2)
+        .enter()
+        .append("circle")
+        .attr("class", "outlier")
+        .attr("cx", d => x2(d.restaurant) + x2.bandwidth() / 2)
+        .attr("cy", d => y2(d.calories))
+        .attr("r", 3)
+        .attr("fill", "black")
+        .attr("opacity", 0.7);
+
+      svg2.append("text")
+        .attr("x", width2 / 2)
+        .attr("y", height2 + 100)
+        .attr("text-anchor", "middle")
+        .text("Restaurant");
+
+      svg2.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height2 / 2)
+        .attr("y", -60)
+        .attr("text-anchor", "middle")
+        .text("Calories per Menu Item");
+    }).catch(err => {
+      console.error("Error loading CSV or drawing chart (Graph 2):", err);
+    });
+  </script>
+
+  <!-- ========== Graph 3 JS (Scatter Plot) ========== -->
+  <script>
+    const margin3 = { top: 40, right: 40, bottom: 80, left: 80 };
+    const width3 = 900 - margin3.left - margin3.right;
+    const height3 = 500 - margin3.top - margin3.bottom;
+
+    const svg3 = d3.select("#scatter-graph3")
+      .append("svg")
+      .attr("width", width3 + margin3.left + margin3.right)
+      .attr("height", height3 + margin3.top + margin3.bottom)
+      .append("g")
+      .attr("transform", `translate(${margin3.left},${margin3.top})`);
+
+    const tooltip3 = d3.select("body")
+      .append("div")
+      .attr("class", "tooltip");
+
+    d3.csv("fastfood.csv", d3.autoType).then(data => {
+      console.log("Loaded rows for Graph 3:", data.length);
+
+      data = data.filter(d => d.calories != null && !isNaN(d.calories));
+
+      const metrics3 = {
+        sodium: { label: "Sodium (mg)", accessor: d => d.sodium },
+        total_fat: { label: "Total Fat (g)", accessor: d => d.total_fat },
+        sugar: { label: "Sugar (g)", accessor: d => d.sugar }
+      };
+
+      const restaurants3 = Array.from(new Set(data.map(d => d.restaurant))).sort();
+      const color3 = d3.scaleOrdinal()
+        .domain(restaurants3)
+        .range(d3.schemeTableau10.concat(d3.schemeSet3));
+
+      const x3 = d3.scaleLinear()
+        .domain(d3.extent(data, d => d.calories))
+        .nice()
+        .range([0, width3]);
+
+      svg3.append("g")
+        .attr("transform", `translate(0,${height3})`)
+        .call(d3.axisBottom(x3));
+
+      svg3.append("text")
+        .attr("x", width3 / 2)
+        .attr("y", height3 + 60)
+        .attr("text-anchor", "middle")
+        .text("Calories");
+
+      const y3 = d3.scaleLinear().range([height3, 0]);
+      const yAxisGroup3 = svg3.append("g");
+
+      const yLabel3 = svg3.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height3 / 2)
+        .attr("y", -55)
+        .attr("text-anchor", "middle");
+
+      const circlesGroup3 = svg3.append("g");
+
+      const legend3 = d3.select("#legend")
+        .selectAll("span")
+        .data(restaurants3)
+        .enter()
+        .append("span");
+
+      legend3.append("svg")
+        .attr("width", 10)
+        .attr("height", 10)
+        .append("rect")
+        .attr("width", 10)
+        .attr("height", 10)
+        .attr("fill", d => color3(d));
+
+      legend3.append("span").text(d => d);
+
+      const metricSelect3 = d3.select("#metric-select");
+
+      function update3(metricKey) {
+        const metric = metrics3[metricKey];
+
+        const filtered = data.filter(d => metric.accessor(d) != null && !isNaN(metric.accessor(d)));
+
+        y3.domain(d3.extent(filtered, metric.accessor)).nice();
+
+        yAxisGroup3.transition()
+          .duration(600)
+          .call(d3.axisLeft(y3));
+
+        yLabel3.text(metric.label);
+
+        const dots = circlesGroup3
+          .selectAll("circle")
+          .data(filtered, d => d.restaurant + "_" + d.item + "_" + d.calories);
+
+        dots.join(
+          enter => enter.append("circle")
+            .attr("cx", d => x3(d.calories))
+            .attr("cy", d => y3(metric.accessor(d)))
+            .attr("r", 4)
+            .attr("fill", d => color3(d.restaurant))
+            .attr("opacity", 0.7)
+            .on("mouseover", (event, d) => {
+              tooltip3
+                .style("opacity", 1)
+                .html(
+                  `<strong>${d.item}</strong><br/>
+                   Restaurant: ${d.restaurant}<br/>
+                   Calories: ${d.calories}<br/>
+                   Sodium: ${d.sodium ?? "N/A"} mg<br/>
+                   Total Fat: ${d.total_fat ?? "N/A"} g<br/>
+                   Sugar: ${d.sugar ?? "N/A"} g`
+                )
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY + 10) + "px");
+            })
+            .on("mousemove", (event) => {
+              tooltip3
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY + 10) + "px");
+            })
+            .on("mouseout", () => {
+              tooltip3.style("opacity", 0);
+            }),
+          update => update
+            .transition()
+            .duration(600)
+            .attr("cx", d => x3(d.calories))
+            .attr("cy", d => y3(metric.accessor(d))),
+          exit => exit
+            .transition()
+            .duration(400)
+            .attr("r", 0)
+            .remove()
+        );
+      }
+
+      update3("sodium");
+
+      metricSelect3.on("change", function () {
+        const selected = this.value;
+        update3(selected);
+      });
+    }).catch(err => {
+      console.error("Error loading CSV or drawing scatter plot (Graph 3):", err);
+    });
+  </script>
+
+</body>
+</html>
