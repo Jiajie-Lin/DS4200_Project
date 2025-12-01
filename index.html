@@ -38,6 +38,10 @@
       text-align: center;
     }
 
+    #controls select {
+      margin: 0 10px;
+    }
+
     #scatter-graph3 {
       margin-top: 10px;
     }
@@ -161,6 +165,11 @@
       <option value="total_fat">Total Fat (g)</option>
       <option value="sugar">Sugar (g)</option>
     </select>
+    
+    <label for="restaurant-select" style="margin-left: 20px;">Restaurant:&nbsp;</label>
+    <select id="restaurant-select">
+      <option value="all">All Restaurants</option>
+    </select>
   </div>
 
   <div id="scatter-graph3"></div>
@@ -207,16 +216,16 @@
     <strong>What we learned from the graphs:</strong>
     Graph 1 compares average nutritional content across restaurants and shows that some chains
     have consistently higher levels of calories, fat, and sodium, while others provide items
-    with relatively more fiber, vitamins, or protein. This suggests that the “typical” meal at
+    with relatively more fiber, vitamins, or protein. This suggests that the "typical" meal at
     one chain can be much heavier than at another, even before looking at portion size.
   </p>
 
   <p style="text-indent: 2em;">
     Graph 2 and Graph 3 focus on how risky a single choice can be. The box plots in Graph 2 show
     how calories are spread within each restaurant. Chains with tall boxes and long whiskers
-    offer both moderate and extremely high calorie items, which makes it easy to “accidentally”
+    offer both moderate and extremely high calorie items, which makes it easy to "accidentally"
     pick an item that is far above the average. Graph 3 shows that once calories go up, sodium,
-    fat, and sugar usually increase at the same time. High calorie items are rarely “bad” in only
+    fat, and sugar usually increase at the same time. High calorie items are rarely "bad" in only
     one dimension. They tend to be high in several unhealthy metrics, which increases long term
     health risks such as heart disease and high blood pressure.
   </p>
@@ -232,7 +241,7 @@
   </p>
 
   <p style="text-indent: 2em;">
-    Graph 5 focuses on the top ten “best” and “worst” items for calories, fat, sodium, and sugar.
+    Graph 5 focuses on the top ten "best" and "worst" items for calories, fat, sodium, and sugar.
     It shows that the gap between the healthiest and least healthy items is very large. For many
     metrics, the worst items contain several times more calories, fat, or sodium than the best
     items from the same dataset. At the same time, the healthiest items are often salads or
@@ -247,8 +256,8 @@
     categories, and menu items reliably carry higher nutritional risks. At the same time, there
     are better choices hidden in the menus if customers know where to look. In future work, this
     analysis could be extended to portion sizes, prices, and daily recommended limits, or turned
-    into an interactive tool where users can filter by personal goals such as “low sodium” or
-    “high protein.” Our project is a first step toward making the fast food environment more
+    into an interactive tool where users can filter by personal goals such as "low sodium" or
+    "high protein." Our project is a first step toward making the fast food environment more
     transparent, so that people can make informed decisions rather than guessing from the menu
     pictures alone.
   </p>
@@ -307,7 +316,14 @@
         };
       });
 
-      grouped.sort((a, b) => d3.ascending(a.restaurant, b.restaurant));
+      // Custom order for restaurants
+      const customOrder = ['Mcdonalds', 'Sonic', 'Burger King', 'Arbys', 'Dairy Queen', 'Subway', 'Taco Bell', 'Chick Fil-A'];
+      
+      grouped.sort((a, b) => {
+        const indexA = customOrder.indexOf(a.restaurant);
+        const indexB = customOrder.indexOf(b.restaurant);
+        return indexA - indexB;
+      });
 
       const x2 = d3.scaleBand()
         .domain(grouped.map(d => d.restaurant))
@@ -461,6 +477,14 @@
         .domain(restaurants3)
         .range(d3.schemeTableau10.concat(d3.schemeSet3));
 
+      // Populate restaurant dropdown
+      const restaurantSelect = d3.select("#restaurant-select");
+      restaurants3.forEach(restaurant => {
+        restaurantSelect.append("option")
+          .attr("value", restaurant)
+          .text(restaurant);
+      });
+
       const x3 = d3.scaleLinear()
         .domain(d3.extent(data, d => d.calories))
         .nice()
@@ -504,11 +528,17 @@
       legend3.append("span").text(d => d);
 
       const metricSelect3 = d3.select("#metric-select");
+      let currentMetric = "sodium";
+      let currentRestaurant = "all";
 
-      function update3(metricKey) {
-        const metric = metrics3[metricKey];
+      function update3() {
+        const metric = metrics3[currentMetric];
 
-        const filtered = data.filter(d => metric.accessor(d) != null && !isNaN(metric.accessor(d)));
+        // Filter by restaurant selection
+        let filtered = data.filter(d => metric.accessor(d) != null && !isNaN(metric.accessor(d)));
+        if (currentRestaurant !== "all") {
+          filtered = filtered.filter(d => d.restaurant === currentRestaurant);
+        }
 
         y3.domain(d3.extent(filtered, metric.accessor)).nice();
 
@@ -564,11 +594,16 @@
         );
       }
 
-      update3("sodium");
+      update3();
 
       metricSelect3.on("change", function () {
-        const selected = this.value;
-        update3(selected);
+        currentMetric = this.value;
+        update3();
+      });
+
+      restaurantSelect.on("change", function () {
+        currentRestaurant = this.value;
+        update3();
       });
     }).catch(err => {
       console.error("Error loading CSV or drawing scatter plot (Graph 3):", err);

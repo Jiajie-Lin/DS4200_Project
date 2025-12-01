@@ -22,7 +22,7 @@ avg_nutrition = df.groupby('restaurant').agg({
     'calcium': 'mean'
 }).reset_index()
 
-# Reshape data for radio button selection
+# Reshape data for dropdown selection
 nutrition_long = avg_nutrition.melt(
     id_vars=['restaurant'],
     value_vars=['calories', 'cal_fat', 'total_fat', 'sat_fat', 'trans_fat', 
@@ -32,8 +32,8 @@ nutrition_long = avg_nutrition.melt(
     value_name='value'
 )
 
-# Create radio button widget (changed from dropdown)
-metric_radio = alt.binding_radio(
+# Create dropdown menu
+metric_dropdown = alt.binding_select(
     options=['calories', 'cal_fat', 'total_fat', 'sat_fat', 'trans_fat', 
              'cholesterol', 'sodium', 'total_carb', 'fiber', 'sugar', 
              'protein', 'vit_a', 'vit_c', 'calcium'],
@@ -46,20 +46,17 @@ metric_radio = alt.binding_radio(
 
 metric_selection = alt.selection_point(
     fields=['metric'],
-    bind=metric_radio,
+    bind=metric_dropdown,
     value='calories'
 )
 
-# Create the chart - restaurants stay in same position
+# Create the chart - sorted from largest to smallest
 chart = alt.Chart(nutrition_long).mark_bar().encode(
     x=alt.X('restaurant:N', 
-            sort=None,  # No sorting - keeps original order
+            sort='-y',  # Sort by y-axis values (largest to smallest)
             axis=alt.Axis(title='Restaurant', labelAngle=-45)),
     y=alt.Y('value:Q', 
             axis=alt.Axis(title='Average Value')),
-    color=alt.Color('value:Q',
-                    scale=alt.Scale(scheme='redyellowgreen', reverse=True),
-                    legend=alt.Legend(title='Value')),
     tooltip=[
         alt.Tooltip('restaurant:N', title='Restaurant'),
         alt.Tooltip('metric:N', title='Metric'),
@@ -83,4 +80,4 @@ chart = alt.Chart(nutrition_long).mark_bar().encode(
 
 # Save as HTML
 chart.save('graph1.html')
-print("Interactive chart with radio buttons saved as graph1.html!")
+print("Interactive chart with dropdown menu saved as graph1.html!")
