@@ -2,7 +2,7 @@ Design Rationale: Fast Food Nutrition Visualizations
 
 DS 4200 Final Project
 Jiajie Lin, Weilun Guan, Jiayu Zou
-
+Website Link: https://jiajie-lin.github.io/DS4200_Project-Nutrition/
 ────────────────────────────────────────────────────────────────
 
 GRAPH 1: Bar Chart – Average Calories by Restaurant
