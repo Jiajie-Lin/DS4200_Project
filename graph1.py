@@ -67,8 +67,8 @@ chart = alt.Chart(nutrition_long).mark_bar().encode(
 ).add_params(
     metric_selection
 ).properties(
-    width=800,
-    height=500,
+    width=850,
+    height=400,
     title='Average Nutritional Content by Fast Food Restaurant'
 ).configure_axis(
     labelFontSize=12,
@@ -76,6 +76,8 @@ chart = alt.Chart(nutrition_long).mark_bar().encode(
 ).configure_title(
     fontSize=16,
     anchor='middle'
+).configure_view(
+    strokeWidth=0
 )
 
 # Save as HTML
